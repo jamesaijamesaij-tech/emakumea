@@ -59,6 +59,8 @@ summary{cursor:pointer;font-weight:600;color:var(--ink)}
 .legal{padding:.5rem 0 .25rem;font-size:.88rem}
 .legal h4{margin:.9rem 0 .25rem;font-size:.95rem;color:var(--ink)}
 .legal p{margin:0 0 .5rem}
+.sec{font-size:clamp(1.5rem,5vw,2.2rem);font-weight:800;margin:1.5rem 0 .25rem;letter-spacing:-.02em}
+.sub{margin:0;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -73,6 +75,12 @@ summary{cursor:pointer;font-weight:600;color:var(--ink)}
     <p>Belleza, bienestar, moda y regalos con una idea clara de qué buscar en cada uno. Sin ruido, directo a Amazon.</p>
   </section>
 
+  <section aria-labelledby="dest">
+    <h2 class="sec" id="dest">Para empezar</h2>
+    <p class="sub">Cuatro ideas fáciles de regalar o de darse un capricho.</p>
+    <div class="grid" id="featured"></div>
+  </section>
+  <h2 class="sec">Más ideas</h2>
   <nav class="filters" id="filters" aria-label="Categorías"></nav>
   <main class="grid" id="grid" aria-live="polite"></main>
 
@@ -106,7 +114,7 @@ summary{cursor:pointer;font-weight:600;color:var(--ink)}
 // 1) Cambia estos dos valores por los tuyos
 var AMAZON_DOMAIN = "www.amazon.es";
 var AFFILIATE_TAG = "jamesai-21";
-var LEGAL = {nombre:"Jaime Aizcorbe Iñigo", nif:"72669158Z", email:"jamesaijamesaij@gmail.com"};
+var LEGAL = {nombre:"Jaime Aizcorbe Iñigo", nif:"[TU NIF]", email:"jamesaijamesaij@gmail.com"};
 
 var CATS = ["Todo","Belleza","Bienestar","Moda","Hogar","Regalos"];
 var PRODUCTS = [
@@ -116,9 +124,7 @@ var PRODUCTS = [
   {n:"Esterilla de yoga",c:"Bienestar",e:"🧘‍♀️",t:"t2",q:"esterilla yoga antideslizante",d:"Prioriza el agarre y un grosor cómodo para las rodillas."},
   {n:"Bolso bandolera",c:"Moda",e:"👜",t:"t3",q:"bolso bandolera mujer",d:"Un tono neutro combina con casi todo. Revisa los bolsillos interiores."},
   {n:"Pañuelo de seda",c:"Moda",e:"🧣",t:"t1",q:"panuelo seda mujer",d:"Sirve en el cuello, el pelo o el bolso. Un accesorio pequeño que cambia el look."},
-  {n:"Vela aromática de soja",c:"Hogar",e:"🕯️",t:"t4",q:"vela aromatica cera de soja",d:"La cera de soja suele quemar más limpia. Elige un aroma suave si es para el dormitorio."},
   {n:"Kit de cuidado de manos",c:"Regalos",e:"🎁",t:"t2",q:"set regalo crema manos mujer",d:"Un regalo fácil de acertar: crema, bálsamo y presentación lista para entregar."},
-  {n:"Mascarillas faciales de tela",c:"Belleza",e:"🧖‍♀️",t:"t2",q:"mascarilla facial tela hidratante",d:"Ideales para una noche de autocuidado. Mira los ingredientes si tienes la piel sensible."},
   {n:"Set de brochas de maquillaje",c:"Belleza",e:"🖌️",t:"t3",q:"set brochas maquillaje",d:"Un set básico cubre base, sombras y colorete. Revisa que incluya funda para viajar."},
   {n:"Antifaz de seda para dormir",c:"Bienestar",e:"😴",t:"t1",q:"antifaz dormir seda",d:"Bloquea la luz y es suave con la piel. Fíjate en que la goma sea ajustable."},
   {n:"Rodillo de masaje",c:"Bienestar",e:"💆‍♀️",t:"t4",q:"foam roller rodillo masaje",d:"Útil después de entrenar o de un día sentada. Elige la dureza según tu experiencia."},
@@ -160,6 +166,24 @@ filters.addEventListener("click",function(e){
   renderFilters(); renderGrid();
 });
 renderFilters(); renderGrid();
+var FEATURED = [
+  {n:"Pack de jabones naturales de aceite de oliva",c:"Cuidado personal",e:"🧼",t:"t2",a:"B0HJW6FGJ6",d:"Pack de 3 jabones de 105 g en formato regalo, de Loman’s Cosmetic. Una opción práctica para regalar."},
+  {n:"Set de 3 velas aromáticas",c:"Hogar",e:"🕯️",t:"t3",a:"B0H36DXFHD",d:"Tres velas de 120 g de cera de soja y coco, con aromas amaderados y especiados. Según el vendedor, duran unas 90 horas."},
+  {n:"Aceite de masaje cálido Hot Moments",c:"Bienestar",e:"🌸",t:"t1",a:"B0BRT2T99X",d:"Aceite de masaje de efecto calor, de Vibratissimo, en formato de 100 ml. Producto para adultos."},
+  {n:"Set de 15 mascarillas faciales",c:"Belleza",e:"🧖‍♀️",t:"t4",a:"B0GJT2K3RX",d:"Set de regalo con 15 mascarillas que, según el vendedor, incluyen colágeno, ácido hialurónico, vitamina C y oro de 24 K."},
+  {n:"Máscara facial LED con luz roja",c:"Belleza",e:"✨",t:"t2",a:"B0HGGBHB7H",d:"Máscara de 220 LED con 3 modos, de ALIVIATE. Revisa las indicaciones de uso del fabricante antes de utilizarla."}
+];
+function dlink(a){
+  return "https://" + AMAZON_DOMAIN + "/dp/" + encodeURIComponent(a) + "?tag=" + encodeURIComponent(AFFILIATE_TAG);
+}
+function cardHTML(p){
+  var href = p.a ? dlink(p.a) : link(p.q);
+  var label = p.a ? "Ver en Amazon" : "Ver opciones en Amazon";
+  return '<article class="card"><div class="tile" style="background:var(--'+p.t+')" aria-hidden="true">'+p.e+'</div>'+
+    '<div class="body"><span class="cat">'+esc(p.c)+'</span><h3>'+esc(p.n)+'</h3><p>'+esc(p.d)+'</p>'+
+    '<a class="btn" href="'+href+'" target="_blank" rel="sponsored noopener">'+label+'</a></div></article>';
+}
+document.getElementById("featured").innerHTML = FEATURED.map(cardHTML).join("");
 document.querySelectorAll("[data-l]").forEach(function(el){el.textContent = LEGAL[el.getAttribute("data-l")] || "";});
 </script>
 </body>
